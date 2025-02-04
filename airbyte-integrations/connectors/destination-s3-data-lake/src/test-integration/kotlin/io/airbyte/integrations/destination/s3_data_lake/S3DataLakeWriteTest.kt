@@ -148,6 +148,21 @@ abstract class S3DataLakeWriteTest(
     override fun testDedupChangeCursor() {
         super.testDedupChangeCursor()
     }
+
+    @Test
+    override fun testBasicWrite() {
+        super.testBasicWrite()
+    }
+
+    @Test
+    override fun testFunkyCharacters() {
+        super.testFunkyCharacters()
+    }
+
+    @Test
+    override fun testManyStreamsCompletion() {
+        super.testManyStreamsCompletion()
+    }
 }
 
 class GlueWriteTest :

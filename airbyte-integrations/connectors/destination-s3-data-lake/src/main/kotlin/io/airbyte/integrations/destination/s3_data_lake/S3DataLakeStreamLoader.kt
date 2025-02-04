@@ -21,11 +21,11 @@ import org.apache.iceberg.Table
 @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION", justification = "Kotlin async continuation")
 class S3DataLakeStreamLoader(
     override val stream: DestinationStream,
-    private val table: Table,
-    private val s3DataLakeTableWriterFactory: S3DataLakeTableWriterFactory,
-    private val s3DataLakeUtil: S3DataLakeUtil,
-    private val pipeline: MapperPipeline,
-    private val stagingBranchName: String,
+    val table: Table,
+    val s3DataLakeTableWriterFactory: S3DataLakeTableWriterFactory,
+    val s3DataLakeUtil: S3DataLakeUtil,
+    val pipeline: MapperPipeline,
+    val stagingBranchName: String,
     private val mainBranchName: String
 ) : StreamLoader {
     private val log = KotlinLogging.logger {}

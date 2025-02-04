@@ -10,6 +10,7 @@ import io.airbyte.cdk.load.command.DestinationStream
 import io.airbyte.cdk.load.data.iceberg.parquet.IcebergParquetPipelineFactory
 import io.airbyte.cdk.load.write.DestinationWriter
 import io.airbyte.cdk.load.write.StreamLoader
+import io.airbyte.cdk.load.write.StreamStateStore
 import io.airbyte.integrations.destination.s3_data_lake.io.S3DataLakeTableWriterFactory
 import io.airbyte.integrations.destination.s3_data_lake.io.S3DataLakeUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -26,6 +27,7 @@ class S3DataLakeWriter(
     private val s3DataLakeTableSynchronizer: S3DataLakeTableSynchronizer,
     private val catalog: DestinationCatalog,
     private val tableIdGenerator: TableIdGenerator,
+    private val streamStateStore: StreamStateStore<S3DataLakeStreamLoader>
 ) : DestinationWriter {
     override suspend fun setup() {
         super.setup()
@@ -85,14 +87,19 @@ class S3DataLakeWriter(
             }
         }
 
-        return S3DataLakeStreamLoader(
-            stream = stream,
-            table = table,
-            s3DataLakeTableWriterFactory = s3DataLakeTableWriterFactory,
-            s3DataLakeUtil = s3DataLakeUtil,
-            pipeline = pipeline,
-            stagingBranchName = DEFAULT_STAGING_BRANCH,
-            mainBranchName = icebergConfiguration.icebergCatalogConfiguration.mainBranchName,
-        )
+        val loader =
+            S3DataLakeStreamLoader(
+                stream = stream,
+                table = table,
+                s3DataLakeTableWriterFactory = s3DataLakeTableWriterFactory,
+                s3DataLakeUtil = s3DataLakeUtil,
+                pipeline = pipeline,
+                stagingBranchName = DEFAULT_STAGING_BRANCH,
+                mainBranchName = icebergConfiguration.icebergCatalogConfiguration.mainBranchName,
+            )
+
+        streamStateStore.put(stream.descriptor, loader)
+
+        return loader
     }
 }
